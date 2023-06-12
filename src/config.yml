@@ -1,0 +1,11 @@
+gen-worlds:
+  - gen
+  - gennether
+  - gen2
+
+respawns:
+  - gen|0,0,0|0,0,0|OAK_LOG
+
+# Make specific areas require tools have a specific NBT tag to mine them
+specific-tool-areas:
+  - gen|0,0,0|0,0,0|oaklogarea
