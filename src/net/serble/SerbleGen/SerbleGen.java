@@ -41,7 +41,7 @@ public class SerbleGen extends JavaPlugin implements Listener {
             {
                 List<Location> pos1s = new ArrayList<>();
                 List<Location> pos2s = new ArrayList<>();
-                for (String pointKey : res.getString("points").split(",")) {
+                for (String pointKey : res.getStringList("points")) {
                     String[] locSplit = pointKey.split(" ");
                     pos1s.add(new Location(world, Integer.parseInt(locSplit[0]), Integer.parseInt(locSplit[1]), Integer.parseInt(locSplit[2])));
                     pos2s.add(new Location(world, Integer.parseInt(locSplit[3]), Integer.parseInt(locSplit[4]), Integer.parseInt(locSplit[5])));
