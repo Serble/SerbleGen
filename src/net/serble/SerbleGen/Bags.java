@@ -154,7 +154,7 @@ public class Bags implements Listener {
 
             return contents;
         } else {
-            FileConfiguration save = ConfigManager.load("bag/" + id + ".yml");
+            FileConfiguration save = ConfigManager.load("bags/" + id + ".yml");
 
             // If save doesn't exist return an empty array
             if (save == null) {
