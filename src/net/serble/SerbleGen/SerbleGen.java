@@ -1,6 +1,7 @@
 package net.serble.SerbleGen;
 
 import net.serble.SerbleGen.Schemas.ResourceLocation;
+import net.serble.SerbleGen.Schemas.ShopLocation;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -28,13 +29,14 @@ public class SerbleGen extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
+        this.saveDefaultConfig();
 
         OreResources.init();
         Bags.init();
+        Shops.init();
 
         getServer().getPluginManager().registerEvents(new EventManager(), this);
 
-        this.saveDefaultConfig();
         genWorlds = getConfig().getStringList("gen-worlds");
     }
 
@@ -67,14 +69,19 @@ public class SerbleGen extends JavaPlugin {
         return false;
     }
 
+    public static boolean isInArea(Location loc, ShopLocation shop) {
+        for (int i = 0; i < shop.pos1s.length; i++) {
+            if (isInArea(loc, shop.pos1s[i], shop.pos2s[i])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static boolean isInArea(Location loc, Location pos1, Location pos2) {
         return loc.getX() >= Math.min(pos1.getX(), pos2.getX()) && loc.getX() <= Math.max(pos1.getX(), pos2.getX()) &&
                 loc.getY() >= Math.min(pos1.getY(), pos2.getY()) && loc.getY() <= Math.max(pos1.getY(), pos2.getY()) &&
                 loc.getZ() >= Math.min(pos1.getZ(), pos2.getZ()) && loc.getZ() <= Math.max(pos1.getZ(), pos2.getZ());
-    }
-
-    private static Location parseLocation(World world, String loc) {
-        String[] locSplit = loc.split(" ");
-        return new Location(world, Double.parseDouble(locSplit[0]), Double.parseDouble(locSplit[1]), Double.parseDouble(locSplit[2]));
     }
 }

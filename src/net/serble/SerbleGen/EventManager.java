@@ -7,8 +7,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 public class EventManager implements Listener {
     // This class exists to prevent checks similar to isPlayerInGenWorld() from being repeated in multiple classes
@@ -47,6 +49,26 @@ public class EventManager implements Listener {
         if (e.getPlayer().getGameMode() == GameMode.SURVIVAL) {
             e.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent e) {
+        // Check if the player is in a gen world
+        if (!SerbleGen.isPlayerInGenWorld(e.getPlayer().getName())) {
+            return;
+        }
+
+        Shops.onMove(e);
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent e) {
+        // Check if the player is in a gen world and is a player
+        if (!(e.getEntity() instanceof Player) || !SerbleGen.isPlayerInGenWorld(e.getEntity().getName())) {
+            return;
+        }
+
+        Shops.onDamage(e);
     }
 
     @EventHandler
