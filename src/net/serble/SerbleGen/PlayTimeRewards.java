@@ -2,50 +2,53 @@ package net.serble.SerbleGen;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public class PlayTimeRewards implements Listener {
+    private static final Map<UUID, PlayerPointCounter> playerPointCounters = new HashMap<>();
 
-    private final Map<UUID, Long> lastBlockBreak;
+    public static void onBlockBreak(BlockBreakEvent e) {
+        UUID pUid = e.getPlayer().getUniqueId();
 
-    public PlayTimeRewards() {
-        SerbleGen.plugin.getServer().getScheduler().runTaskTimer(SerbleGen.plugin, new GivePlaytimeExperienceTask(), 0, 20 * 60 * 5);
-        lastBlockBreak = new HashMap<>();
+        if (playerPointCounters.containsKey(pUid)) {
+            playerPointCounters.get(pUid).addPoint();
+        }
+        else {
+            PlayerPointCounter ppc = new PlayerPointCounter();
+            ppc.player = e.getPlayer();
+            ppc.lastBreak = System.currentTimeMillis();
+            ppc.points = 1;
+
+            playerPointCounters.put(pUid, ppc);
+        }
     }
 
-    @EventHandler
-    public void onBlockBreak(BlockBreakEvent event) {
-        lastBlockBreak.put(event.getPlayer().getUniqueId(), System.currentTimeMillis());
-    }
+    private static class PlayerPointCounter {
+        public long lastBreak;
+        public int points;
+        public Player player;
 
-    private class GivePlaytimeExperienceTask implements Runnable {
-        @Override
-        public void run() {
-            for (String world : SerbleGen.genWorlds) {
-                for (Player player : Objects.requireNonNull(Bukkit.getWorld(world)).getPlayers()) {
-                    if (isMining(player)) {
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "sysgivexp " + player.getName() + " 10 Playtime");
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "sysgivemoney " + player.getName() + " 15 Playtime");
-                    }
-                }
+        public void addPoint() {
+            long now = System.currentTimeMillis();
+
+            if (now - lastBreak < 5000) {
+                return;
+            }
+
+            lastBreak = now;
+            points++;
+
+            if (points > 60) {
+                points = 0;
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "sysgivexp " + player.getName() + " 10 Playtime");
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "sysgivemoney " + player.getName() + " 15 Playtime");
             }
         }
-
-        private boolean isMining(Player player) {
-            Long lastBreakTime = lastBlockBreak.get(player.getUniqueId());
-            if (lastBreakTime != null) {
-                return (System.currentTimeMillis() - lastBreakTime) <= (5 * 60 * 1000);
-            }
-            return false;
-        }
-
     }
-
 }

@@ -19,51 +19,20 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-public class SerbleGen extends JavaPlugin implements Listener {
+public class SerbleGen extends JavaPlugin {
 
     public static SerbleGen plugin;
     public static List<String> genWorlds;
-    public static List<ResourceLocation> locations;
     public static Random random = new Random();
 
     @Override
     public void onEnable() {
         plugin = this;
 
-        ConfigurationSection configLocations = SerbleGen.plugin.getConfig().getConfigurationSection("resources");
-
-        locations = new ArrayList<>();
-        for (String resKey : configLocations.getKeys(false)) {
-            ConfigurationSection res = configLocations.getConfigurationSection(resKey);
-
-            ResourceLocation loc = new ResourceLocation();
-            World world = Bukkit.getWorld(res.getString("world"));
-            {
-                List<Location> pos1s = new ArrayList<>();
-                List<Location> pos2s = new ArrayList<>();
-                for (String pointKey : res.getStringList("points")) {
-                    String[] locSplit = pointKey.split(" ");
-                    pos1s.add(new Location(world, Integer.parseInt(locSplit[0]), Integer.parseInt(locSplit[1]), Integer.parseInt(locSplit[2])));
-                    pos2s.add(new Location(world, Integer.parseInt(locSplit[3]), Integer.parseInt(locSplit[4]), Integer.parseInt(locSplit[5])));
-                }
-
-                loc.pos1s = pos1s.toArray(new Location[0]);
-                loc.pos2s = pos2s.toArray(new Location[0]);
-            }
-            loc.blockType = Material.getMaterial(res.getString("block"));
-            loc.dropItem = Material.getMaterial(res.getString("drop"));
-            loc.permTag = res.getString("perm");
-            if (loc.permTag == null) {
-                loc.permTag = "none";
-            }
-
-            locations.add(loc);
-        }
-
-        GenRespawns.init();
+        OreResources.init();
         Bags.init();
-        getServer().getPluginManager().registerEvents(new PlayTimeRewards(), this);
-        getServer().getPluginManager().registerEvents(this, this);
+
+        getServer().getPluginManager().registerEvents(new EventManager(), this);
 
         this.saveDefaultConfig();
         genWorlds = getConfig().getStringList("gen-worlds");
@@ -72,90 +41,6 @@ public class SerbleGen extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         Bags.onDisable();
-    }
-
-    @EventHandler
-    public void onBlockBreak(BlockBreakEvent e) {
-        // Check if the player is in a gen world
-        if (!SerbleGen.isPlayerInGenWorld(e.getPlayer().getName())) {
-            return;
-        }
-
-        Bukkit.getLogger().info("Player broke block!");
-
-        // Check if the block is a specific tool area
-        for (ResourceLocation loc : locations) {
-            if (SerbleGen.isInArea(e.getBlock().getLocation(), loc)) {
-                Bukkit.getLogger().info("Player broke block in area!" + loc.permTag + " " + e.getPlayer().getName() + " " + loc.blockType.toString() + " " + loc.permTag);
-
-                // Check if the player is using the correct tool
-                Player p = e.getPlayer();
-
-                if (!loc.permTag.equalsIgnoreCase("none")) {
-                    ItemStack mainHand = p.getInventory().getItemInMainHand();
-                    if (p.getGameMode() == GameMode.SURVIVAL && !NbtHandler.itemStackHasTag(mainHand, loc.permTag, PersistentDataType.STRING)) {
-                        e.setCancelled(true);
-                        e.getPlayer().sendMessage(ChatColor.RED + "This tool cannot break this block!");
-                        return;
-                    }
-                }
-
-                GenRespawns.onLocBreak(e, loc);
-
-                if (e.getPlayer().getGameMode() == GameMode.SURVIVAL) {
-                    e.setDropItems(false);
-                    p.getInventory().addItem(new ItemStack(loc.dropItem, 1));
-                    p.playSound(p.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.2f, random.nextFloat() * 1.5f + 0.5f);
-
-                    addXp(p, random.nextFloat() * 0.05f + 0.05f);
-                }
-                return;
-            }
-        }
-
-        if (e.getPlayer().getGameMode() == GameMode.SURVIVAL) {
-            e.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onBlockPlace(BlockPlaceEvent e) {
-        // Check if the player is in a gen world
-        if (!SerbleGen.isPlayerInGenWorld(e.getPlayer().getName())) {
-            return;
-        }
-
-        // Check if the block is a specific tool area
-        for (ResourceLocation loc : locations) {
-            if (SerbleGen.isInArea(e.getBlock().getLocation(), loc) && e.getBlockPlaced().getType() == loc.blockType) {
-                return;
-            }
-        }
-
-        if (e.getPlayer().getGameMode() == GameMode.SURVIVAL) {
-            e.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onCraft(CraftItemEvent e) {
-        if (SerbleGen.isPlayerInGenWorld(e.getWhoClicked().getName())) {
-            e.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onPVP(PlayerDeathEvent e) {
-        Player player = e.getEntity();
-        Player killer = player.getKiller();
-
-        if (killer == null || !SerbleGen.isPlayerInGenWorld(killer.getName()) || !SerbleGen.isPlayerInGenWorld(player.getName()) || player == killer) {
-            return;
-        }
-
-        addXp(killer, player.getLevel()/2f + player.getExp()/2f);
-        player.setExp(0);
-        player.setLevel(0);
     }
 
     public static void addXp(Player p, float amount) {
