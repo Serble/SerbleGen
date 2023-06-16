@@ -112,7 +112,10 @@ public class Bags implements Listener {
 
         // save the bag
         bags.put(id, contents);
+        saveBag(id, contents);
+    }
 
+    private static void saveBag(long id, ItemStack[] contents) {
         FileConfiguration save = new YamlConfiguration();
         save.set("contents", contents);
         ConfigManager.save("bags/" + id + ".yml", save);
@@ -120,23 +123,18 @@ public class Bags implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
+        if (!openBags.containsKey(e.getWhoClicked().getUniqueId())) {
+            return;
+        }
+
         // Check if the player is clicking a backpack_no_interact item
         ItemStack item = e.getCurrentItem();
         if (item == null) {
             return;
         }
 
-        Bukkit.getLogger().info("Clicked " + item.getType());
-
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) {
-            return;
-        }
-
-        Bukkit.getLogger().info("no data");
-
-        PersistentDataContainer data = meta.getPersistentDataContainer();
-        if (NbtHandler.hasTag(data, "bag_no_interact", PersistentDataType.STRING)) {
+        if (NbtHandler.itemStackHasTag(item, "bag_no_interact", PersistentDataType.STRING)) {
+            Bukkit.getLogger().info("no interact");
             e.setCancelled(true);
         }
     }
@@ -182,5 +180,22 @@ public class Bags implements Listener {
 
     public static void init() {
         Bukkit.getPluginManager().registerEvents(new Bags(), SerbleGen.plugin);
+    }
+
+    public static void onDisable() {
+        for (Map.Entry<UUID, Tuple<Integer, Long>> entry : openBags.entrySet()) {
+            long id = entry.getValue().b();
+
+            Player p = Bukkit.getPlayer(entry.getKey());
+            if (p == null) {
+                continue;
+            }
+
+            ItemStack[] contents = p.getOpenInventory().getTopInventory().getContents();
+            bags.put(id, contents);
+            saveBag(id, contents);
+
+            p.closeInventory();
+        }
     }
 }

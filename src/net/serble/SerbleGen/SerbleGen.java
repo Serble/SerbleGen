@@ -69,6 +69,11 @@ public class SerbleGen extends JavaPlugin implements Listener {
         genWorlds = getConfig().getStringList("gen-worlds");
     }
 
+    @Override
+    public void onDisable() {
+        Bags.onDisable();
+    }
+
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
         // Check if the player is in a gen world
