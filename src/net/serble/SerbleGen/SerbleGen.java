@@ -15,10 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 public class SerbleGen extends JavaPlugin {
 
@@ -34,6 +31,7 @@ public class SerbleGen extends JavaPlugin {
         OreResources.init();
         Bags.init();
         Shops.init();
+        RareDrops.init();
 
         getServer().getPluginManager().registerEvents(new EventManager(), this);
 
@@ -55,8 +53,8 @@ public class SerbleGen extends JavaPlugin {
         p.setExp(xp);
     }
 
-    public static boolean isPlayerInGenWorld(String playerName) {
-        return genWorlds.contains(Objects.requireNonNull(plugin.getServer().getPlayer(playerName)).getWorld().getName());
+    public static boolean isPlayerInGenWorld(Player p) {
+        return genWorlds.contains(p.getWorld().getName());
     }
 
     public static boolean isInArea(Location loc, ResourceLocation res) {
@@ -83,5 +81,13 @@ public class SerbleGen extends JavaPlugin {
         return loc.getX() >= Math.min(pos1.getX(), pos2.getX()) && loc.getX() <= Math.max(pos1.getX(), pos2.getX()) &&
                 loc.getY() >= Math.min(pos1.getY(), pos2.getY()) && loc.getY() <= Math.max(pos1.getY(), pos2.getY()) &&
                 loc.getZ() >= Math.min(pos1.getZ(), pos2.getZ()) && loc.getZ() <= Math.max(pos1.getZ(), pos2.getZ());
+    }
+
+    public static void giveItem(Player p, Location blockLocation, ItemStack... items) {
+        HashMap<Integer, ItemStack> failedItems = p.getInventory().addItem(items);
+
+        for (ItemStack item : failedItems.values()) {
+            p.getWorld().dropItemNaturally(blockLocation, item);
+        }
     }
 }

@@ -50,7 +50,7 @@ public class OreResources {
             locations.add(loc);
         }
 
-        respawnAll();
+        SerbleGen.plugin.getServer().getScheduler().runTaskLater(SerbleGen.plugin, OreResources::respawnAll, 1);
     }
 
     public static boolean onBlockBreak(BlockBreakEvent e) {
@@ -59,8 +59,6 @@ public class OreResources {
             if (!SerbleGen.isInArea(e.getBlock().getLocation(), loc)) {
                 continue;
             }
-
-            Bukkit.getLogger().info("Player broke block in area!" + loc.permTag + " " + e.getPlayer().getName() + " " + loc.blockType.toString() + " " + loc.permTag);
 
             // Check if the player is using the correct tool
             Player p = e.getPlayer();
@@ -82,10 +80,9 @@ public class OreResources {
             // Auto-pickup the item and give xp
             if (e.getPlayer().getGameMode() == GameMode.SURVIVAL) {
                 e.setDropItems(false);
-                p.getInventory().addItem(new ItemStack(loc.dropItem, 1));
-                p.playSound(p.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.2f, SerbleGen.random.nextFloat() * 1.5f + 0.5f);
+                SerbleGen.giveItem(p, e.getBlock().getLocation(), new ItemStack(loc.dropItem, 1));
 
-                SerbleGen.addXp(p, SerbleGen.random.nextFloat() * 0.05f + 0.05f);
+                p.playSound(p.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.2f, SerbleGen.random.nextFloat() * 1.5f + 0.5f);
             }
             return true;
         }

@@ -41,11 +41,8 @@ public class Shops {
 
             {
                 String[] spawnSplit = res.getString("spawn").split(" ");
-                loc.spawnPos = new Location(world, Integer.parseInt(spawnSplit[0]), Integer.parseInt(spawnSplit[1]), Integer.parseInt(spawnSplit[2]));
+                loc.spawnPos = new Location(world, Double.parseDouble(spawnSplit[0]), Double.parseDouble(spawnSplit[1]), Double.parseDouble(spawnSplit[2]));
                 loc.spawnPos.setYaw(Float.parseFloat(spawnSplit[3]));
-
-                loc.spawnPos.setX(loc.spawnPos.getX() + 0.5);
-                loc.spawnPos.setZ(loc.spawnPos.getZ() + 0.5);
             }
 
             locations.add(loc);

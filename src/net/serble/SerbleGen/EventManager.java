@@ -1,6 +1,5 @@
 package net.serble.SerbleGen;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,13 +18,15 @@ public class EventManager implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
         // Check if the player is in a gen world
-        if (!SerbleGen.isPlayerInGenWorld(e.getPlayer().getName())) {
+        if (!SerbleGen.isPlayerInGenWorld(e.getPlayer())) {
             return;
         }
 
         PlayTimeRewards.onBlockBreak(e);
 
+        // Returns true if the block is an ore resource and the player has the correct tool
         if (OreResources.onBlockBreak(e)) {
+            RareDrops.onBlockBreak(e);
             return;
         }
 
@@ -38,7 +39,7 @@ public class EventManager implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
         // Check if the player is in a gen world
-        if (!SerbleGen.isPlayerInGenWorld(e.getPlayer().getName())) {
+        if (!SerbleGen.isPlayerInGenWorld(e.getPlayer())) {
             return;
         }
 
@@ -54,7 +55,7 @@ public class EventManager implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         // Check if the player is in a gen world
-        if (!SerbleGen.isPlayerInGenWorld(e.getPlayer().getName())) {
+        if (!SerbleGen.isPlayerInGenWorld(e.getPlayer())) {
             return;
         }
 
@@ -64,7 +65,7 @@ public class EventManager implements Listener {
     @EventHandler
     public void onDamage(EntityDamageEvent e) {
         // Check if the player is in a gen world and is a player
-        if (!(e.getEntity() instanceof Player) || !SerbleGen.isPlayerInGenWorld(e.getEntity().getName())) {
+        if (!(e.getEntity() instanceof Player) || !SerbleGen.isPlayerInGenWorld((Player) e.getEntity())) {
             return;
         }
 
@@ -73,7 +74,7 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onCraft(CraftItemEvent e) {
-        if (SerbleGen.isPlayerInGenWorld(e.getWhoClicked().getName())) {
+        if (SerbleGen.isPlayerInGenWorld((Player) e.getWhoClicked())) {
             e.setCancelled(true);
         }
     }
@@ -83,12 +84,12 @@ public class EventManager implements Listener {
         Player player = e.getEntity();
         Player killer = player.getKiller();
 
-        if (!SerbleGen.isPlayerInGenWorld(player.getName())) {
+        if (!SerbleGen.isPlayerInGenWorld(player)) {
             return;
         }
 
         // If there is a killer
-        if (killer != null && SerbleGen.isPlayerInGenWorld(killer.getName()) && player.getUniqueId() != killer.getUniqueId()) {
+        if (killer != null && SerbleGen.isPlayerInGenWorld(killer) && player.getUniqueId() != killer.getUniqueId()) {
             SerbleGen.addXp(killer, player.getLevel() / 2f + player.getExp() / 2f);
         }
 
