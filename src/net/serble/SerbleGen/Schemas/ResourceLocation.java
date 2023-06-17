@@ -8,5 +8,9 @@ public class ResourceLocation {
     public Location[] pos2s;
     public Material blockType;
     public Material dropItem;
+    public int dropMin;
+    public int dropVariation;
+    public int breakCount;
+    public long respawnTime;
     public String permTag;
 }

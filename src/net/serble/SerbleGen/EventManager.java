@@ -25,7 +25,13 @@ public class EventManager implements Listener {
         PlayTimeRewards.onBlockBreak(e);
 
         // Returns true if the block is an ore resource and the player has the correct tool
-        if (OreResources.onBlockBreak(e)) {
+        int oreResourcesResult = OreResources.onBlockBreak(e);
+        if (oreResourcesResult == 1) {
+            e.setCancelled(true);
+            return;
+        }
+
+        if (oreResourcesResult == 2) {
             RareDrops.onBlockBreak(e);
             return;
         }
