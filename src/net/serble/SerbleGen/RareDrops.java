@@ -41,6 +41,11 @@ public class RareDrops {
     public static void onBlockBreak(BlockBreakEvent e) {
         Player p = e.getPlayer();
 
+        // If the player is not in a full featured world, don't do anything
+        if (!SerbleGen.isInFullFeaturedWorld(p)) {
+            return;
+        }
+
         SerbleGen.addXp(p, SerbleGen.random.nextFloat() * 0.1f + 0.05f);
 
         // Make item only drop randomly depending on the player's xp level
@@ -61,6 +66,11 @@ public class RareDrops {
     }
 
     public static void onPlayerKill(Player player, Player killer) {
+        // If the player is not in a full featured world, don't do anything
+        if (!SerbleGen.isInFullFeaturedWorld(player)) {
+            return;
+        }
+
         // If there is a killer
         if (killer != null && SerbleGen.isInGenWorld(killer) && player.getUniqueId() != killer.getUniqueId()) {
             SerbleGen.addXp(killer, player.getLevel() / 2f + player.getExp() / 2f);

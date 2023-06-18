@@ -17,6 +17,7 @@ public class SerbleGen extends JavaPlugin {
 
     public static SerbleGen plugin;
     public static List<String> genWorlds;
+    public static List<String> fullFeaturedWorlds;
     public static Random random = new Random();
     public static DebugService debugService;
 
@@ -30,6 +31,9 @@ public class SerbleGen extends JavaPlugin {
         Shops.init();
         RareDrops.init();
 
+        genWorlds = getConfig().getStringList("gen-worlds");
+        fullFeaturedWorlds = getConfig().getStringList("full-featured-worlds");
+
         getServer().getPluginManager().registerEvents(new EventManager(), this);
 
         RegisteredServiceProvider<DebugService> debugServiceProvider = getServer().getServicesManager().getRegistration(DebugService.class);
@@ -38,8 +42,6 @@ public class SerbleGen extends JavaPlugin {
         } else {
             Bukkit.getLogger().warning("DebugService not found!");
         }
-
-        genWorlds = getConfig().getStringList("gen-worlds");
     }
 
     @Override
@@ -59,6 +61,10 @@ public class SerbleGen extends JavaPlugin {
 
     public static boolean isInGenWorld(Entity e) {
         return genWorlds.contains(e.getWorld().getName());
+    }
+
+    public static boolean isInFullFeaturedWorld(Entity e) {
+        return fullFeaturedWorlds.contains(e.getWorld().getName());
     }
 
     public static boolean isInArea(Location loc, ResourceLocation res) {
