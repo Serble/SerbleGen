@@ -21,14 +21,21 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
-        // Check if the player is in a gen world
+        // Check if the block broken is in a gen world
+        if (!SerbleGen.isInGenWorld(e.getBlock().getLocation())) {
+            return;
+        }
+
+        // Disallow breaking if it was not done by a player
         if (!SerbleGen.isInGenWorld(e.getPlayer())) {
+            e.setCancelled(true);
             return;
         }
 
         PlayTimeRewards.onBlockBreak(e);
 
-        // Returns true if the block is an ore resource and the player has the correct tool
+        // Returns 2 if the block is an ore resource and the player has the correct tool
+        // Returns 1 if the event should be cancelled
         int oreResourcesResult = OreResources.onBlockBreak(e);
         if (oreResourcesResult == 1) {
             e.setCancelled(true);

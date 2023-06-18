@@ -63,8 +63,16 @@ public class SerbleGen extends JavaPlugin {
         return genWorlds.contains(e.getWorld().getName());
     }
 
+    public static boolean isInGenWorld(Location loc) {
+        return genWorlds.contains(loc.getWorld().getName());
+    }
+
     public static boolean isInFullFeaturedWorld(Entity e) {
         return fullFeaturedWorlds.contains(e.getWorld().getName());
+    }
+
+    public static boolean isInFullFeaturedWorld(Location loc) {
+        return fullFeaturedWorlds.contains(loc.getWorld().getName());
     }
 
     public static boolean isInArea(Location loc, ResourceLocation res) {
