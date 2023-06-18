@@ -82,7 +82,12 @@ public class EventManager implements Listener {
     @EventHandler
     public void onDamage(EntityDamageEvent e) {
         // Check if the player is in a gen world and is a player
-        if (!(e.getEntity() instanceof Player) || !SerbleGen.isInGenWorld((Player) e.getEntity())) {
+        if (!(e.getEntity() instanceof Player) || !SerbleGen.isInGenWorld(e.getEntity())) {
+            return;
+        }
+
+        if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
+            e.setCancelled(true);
             return;
         }
 
