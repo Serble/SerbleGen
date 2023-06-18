@@ -1,5 +1,6 @@
-package net.serble.SerbleGen;
+package net.serble.SerbleGen.Util;
 
+import net.serble.SerbleGen.*;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -9,7 +10,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -98,28 +98,23 @@ public class EventManager implements Listener {
             return;
         }
 
-        // If there is a killer
-        if (killer != null && SerbleGen.isInGenWorld(killer) && player.getUniqueId() != killer.getUniqueId()) {
-            SerbleGen.addXp(killer, player.getLevel() / 2f + player.getExp() / 2f);
-        }
-
-        // Code to run when a player dies in a gen world, regardless of whether there is a killer
-        player.setExp(0);
-        player.setLevel(0);
+        RareDrops.onPlayerKill(player, killer);
     }
 
     @EventHandler
-    public void onChestOpen(PlayerInteractEvent e) {
+    public void onInteract(PlayerInteractEvent e) {
         if (!SerbleGen.isInGenWorld(e.getPlayer()) ||
                 e.getPlayer().getGameMode() == GameMode.CREATIVE ||
                 e.getClickedBlock() == null) {
             return;
         }
 
+        // Prevent crop trampling
         if (e.getAction() == Action.PHYSICAL && e.getClickedBlock().getType() == Material.FARMLAND) {
             e.setCancelled(true);
         }
 
+        // Prevent opening containers
         if (switch (e.getClickedBlock().getType()) {
             case CHEST, TRAPPED_CHEST, BARREL, FURNACE, BLAST_FURNACE, SMOKER, HOPPER,
                     DROPPER, DISPENSER, BREWING_STAND, ENCHANTING_TABLE -> true;

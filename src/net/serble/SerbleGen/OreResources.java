@@ -1,6 +1,7 @@
 package net.serble.SerbleGen;
 
 import net.serble.SerbleGen.Schemas.ResourceLocation;
+import net.serble.SerbleGen.Util.NbtHandler;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;

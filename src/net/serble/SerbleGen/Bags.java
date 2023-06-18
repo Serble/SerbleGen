@@ -1,6 +1,8 @@
 package net.serble.SerbleGen;
 
 import net.minecraft.util.Tuple;
+import net.serble.SerbleGen.Util.ConfigManager;
+import net.serble.SerbleGen.Util.NbtHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

@@ -1,5 +1,6 @@
-package net.serble.SerbleGen;
+package net.serble.SerbleGen.Util;
 
+import net.serble.SerbleGen.SerbleGen;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;

@@ -60,4 +60,15 @@ public class RareDrops {
             rand -= item.weight;
         }
     }
+
+    public static void onPlayerKill(Player player, Player killer) {
+        // If there is a killer
+        if (killer != null && SerbleGen.isInGenWorld(killer) && player.getUniqueId() != killer.getUniqueId()) {
+            SerbleGen.addXp(killer, player.getLevel() / 2f + player.getExp() / 2f);
+        }
+
+        // Code to run when a player dies in a gen world, regardless of whether there is a killer
+        player.setExp(0);
+        player.setLevel(0);
+    }
 }

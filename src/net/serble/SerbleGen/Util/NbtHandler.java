@@ -1,5 +1,6 @@
-package net.serble.SerbleGen;
+package net.serble.SerbleGen.Util;
 
+import net.serble.SerbleGen.SerbleGen;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
