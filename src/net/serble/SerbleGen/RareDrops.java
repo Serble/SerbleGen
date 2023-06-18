@@ -44,9 +44,7 @@ public class RareDrops {
 
         SerbleGen.addXp(p, SerbleGen.random.nextFloat() * 0.1f + 0.05f);
 
-        // Make item only drop randomly depending on the player's xp (p.getLevel())
-        // There should not be a cap
-        p.sendMessage("You have a " + (Math.pow(p.getLevel(), 0.5)) + "% chance of getting a rare drop!");
+        // Make item only drop randomly depending on the player's xp level
         if (SerbleGen.random.nextFloat() > Math.pow(p.getLevel(), 0.5) / 100f) {
             return;
         }
