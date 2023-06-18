@@ -8,7 +8,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 public class PlayTimeRewards implements Listener {
     private static final Map<UUID, PlayerPointCounter> playerPointCounters = new HashMap<>();

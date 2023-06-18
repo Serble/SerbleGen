@@ -1,10 +1,8 @@
 package net.serble.SerbleGen;
 
-import net.serble.SerbleGen.Schemas.ResourceLocation;
 import net.serble.SerbleGen.Schemas.ShopLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.entity.EntityDamageEvent;
