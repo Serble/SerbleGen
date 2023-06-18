@@ -2,10 +2,12 @@ package net.serble.SerbleGen;
 
 import net.serble.SerbleGen.Schemas.ResourceLocation;
 import net.serble.SerbleGen.Schemas.ShopLocation;
+import net.serble.serblenetworkplugin.API.DebugService;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
@@ -15,6 +17,7 @@ public class SerbleGen extends JavaPlugin {
     public static SerbleGen plugin;
     public static List<String> genWorlds;
     public static Random random = new Random();
+    public static DebugService debugService;
 
     @Override
     public void onEnable() {
@@ -27,6 +30,13 @@ public class SerbleGen extends JavaPlugin {
         RareDrops.init();
 
         getServer().getPluginManager().registerEvents(new EventManager(), this);
+
+        RegisteredServiceProvider<DebugService> debugServiceProvider = getServer().getServicesManager().getRegistration(DebugService.class);
+        if (debugServiceProvider != null) {
+            debugService = debugServiceProvider.getProvider();
+        } else {
+            Bukkit.getLogger().warning("DebugService not found!");
+        }
 
         genWorlds = getConfig().getStringList("gen-worlds");
     }
