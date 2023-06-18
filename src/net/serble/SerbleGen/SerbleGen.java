@@ -3,16 +3,9 @@ package net.serble.SerbleGen;
 import net.serble.SerbleGen.Schemas.ResourceLocation;
 import net.serble.SerbleGen.Schemas.ShopLocation;
 import org.bukkit.*;
-import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
@@ -53,8 +46,8 @@ public class SerbleGen extends JavaPlugin {
         p.setExp(xp);
     }
 
-    public static boolean isPlayerInGenWorld(Player p) {
-        return genWorlds.contains(p.getWorld().getName());
+    public static boolean isInGenWorld(Entity e) {
+        return genWorlds.contains(e.getWorld().getName());
     }
 
     public static boolean isInArea(Location loc, ResourceLocation res) {
