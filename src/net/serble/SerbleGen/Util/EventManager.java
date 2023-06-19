@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -132,6 +133,18 @@ public class EventManager implements Listener {
                     DROPPER, DISPENSER, BREWING_STAND, ENCHANTING_TABLE -> true;
             default -> false;
         }) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityChangeBlock(EntityChangeBlockEvent e) {
+        if (!SerbleGen.isInGenWorld(e.getBlock().getLocation())) {
+            return;
+        }
+
+        // Prevent crop trampling
+        if (e.getBlock().getType() == Material.FARMLAND && e.getTo() == Material.DIRT) {
             e.setCancelled(true);
         }
     }
