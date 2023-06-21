@@ -50,7 +50,7 @@ public class Shops {
     public static void onMove(PlayerMoveEvent e) {
         for (ShopLocation loc : locations) {
             if (SerbleGen.isInArea(e.getTo(), loc)) {
-                e.getPlayer().setBedSpawnLocation(loc.spawnPos, true);
+                SerbleGen.inventoryManagementService.setSpawnPoint(e.getPlayer(), loc.spawnPos);
             }
         }
     }
