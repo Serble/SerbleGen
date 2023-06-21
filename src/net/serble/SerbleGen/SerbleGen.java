@@ -88,6 +88,14 @@ public class SerbleGen extends JavaPlugin {
     }
 
     public static boolean isInArea(Location loc, ResourceLocation res) {
+        if (res.pos1s.length == 0) {
+            return false;
+        }
+
+        if (res.pos1s[0].getWorld().getUID() != loc.getWorld().getUID()) {
+            return false;
+        }
+
         for (int i = 0; i < res.pos1s.length; i++) {
             if (isInArea(loc, res.pos1s[i], res.pos2s[i])) {
                 return true;
@@ -98,6 +106,14 @@ public class SerbleGen extends JavaPlugin {
     }
 
     public static boolean isInArea(Location loc, ShopLocation shop) {
+        if (shop.pos1s.length == 0) {
+            return false;
+        }
+
+        if (shop.pos1s[0].getWorld().getUID() != loc.getWorld().getUID()) {
+            return false;
+        }
+
         for (int i = 0; i < shop.pos1s.length; i++) {
             if (isInArea(loc, shop.pos1s[i], shop.pos2s[i])) {
                 return true;
