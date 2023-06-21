@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
@@ -132,9 +133,15 @@ public class OreResources {
                 }
             }
 
-            // Respawn the block after delay
-            SerbleGen.plugin.getServer().getScheduler().runTaskLater(SerbleGen.plugin, () ->
-                    e.getBlock().setType(loc.blockType), loc.respawnTime);
+            // Respawn the block after delay, ignore if its a regrow pickaxe from genitems
+            PersistentDataContainer itemData = NbtHandler.getPersistentDataContainer(e.getPlayer().getInventory().getItemInMainHand());
+            if (itemData == null || !Objects.equals(itemData.get(
+                    Objects.requireNonNull(NamespacedKey.fromString("serbleitems:id")),
+                    PersistentDataType.STRING), "regrow_pickaxe")) {
+
+                SerbleGen.plugin.getServer().getScheduler().runTaskLater(SerbleGen.plugin, () ->
+                        e.getBlock().setType(loc.blockType), loc.respawnTime);
+            }
 
             // Auto-pickup the item and give xp
             if (e.getPlayer().getGameMode() == GameMode.SURVIVAL) {

@@ -8,6 +8,15 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 public class NbtHandler {
+    public static PersistentDataContainer getPersistentDataContainer(ItemStack itemStack) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null) {
+            return null;
+        }
+
+        return itemMeta.getPersistentDataContainer();
+    }
+
     public static <T, Z> boolean itemStackSetTag(ItemStack itemStack, String tagName, PersistentDataType<T, Z> type, Z tagValue) {
         // Get the ItemStack's ItemMeta
         ItemMeta itemMeta = itemStack.getItemMeta();
