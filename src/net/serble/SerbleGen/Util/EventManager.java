@@ -130,7 +130,7 @@ public class EventManager implements Listener {
         // Prevent opening containers
         if (switch (e.getClickedBlock().getType()) {
             case CHEST, TRAPPED_CHEST, BARREL, FURNACE, BLAST_FURNACE, SMOKER, HOPPER,
-                    DROPPER, DISPENSER, BREWING_STAND, ENCHANTING_TABLE -> true;
+                    DROPPER, DISPENSER, BREWING_STAND -> true;
             default -> false;
         }) {
             e.setCancelled(true);
