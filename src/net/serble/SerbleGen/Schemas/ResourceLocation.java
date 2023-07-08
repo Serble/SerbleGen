@@ -13,4 +13,5 @@ public class ResourceLocation {
     public int breakCount;
     public long respawnTime;
     public String permTag;
+    public ToolType toolType;
 }

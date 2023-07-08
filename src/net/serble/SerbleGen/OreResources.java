@@ -1,6 +1,7 @@
 package net.serble.SerbleGen;
 
 import net.serble.SerbleGen.Schemas.ResourceLocation;
+import net.serble.SerbleGen.Schemas.ToolType;
 import net.serble.SerbleGen.Util.NbtHandler;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
@@ -76,6 +77,8 @@ public class OreResources {
 
             loc.respawnTime = (long)(res.getDouble("respawn-time", defaultRespawnTime) * 20);
 
+            loc.toolType = ToolType.valueOf(res.getString("tool", "Axe"));
+
             locations.add(loc);
         }
 
@@ -95,18 +98,13 @@ public class OreResources {
                 Float count = breakCounter.getOrDefault(blockLoc, null);
 
                 ItemStack hand = e.getPlayer().getInventory().getItemInMainHand();
-                float breakPower = switch (hand.getType()) {
-                    case WOODEN_HOE -> 1;
-                    case STONE_HOE -> 2;
-                    case IRON_HOE -> 3;
-                    case DIAMOND_HOE -> 4;
-                    case NETHERITE_HOE -> 8;
+                float breakPower = getBreakPower(hand.getType(), loc.toolType);
 
-                    default -> 0.75f;
-                };
-
-                int efficiency = hand.getEnchantmentLevel(Enchantment.DIG_SPEED);
-                breakPower += 1 + (efficiency << 1);
+                // Check if the player is using the correct tool
+                if (breakPower != 0.75f) {
+                    int efficiency = hand.getEnchantmentLevel(Enchantment.DIG_SPEED);
+                    breakPower += 1 + (efficiency << 1);
+                }
 
                 if (count == null) {
                     breakCounter.put(blockLoc, breakPower);
@@ -154,6 +152,25 @@ public class OreResources {
         }
 
         return 0;
+    }
+
+    private static float getBreakPower(Material tool, ToolType type) {
+        String toolSuffix = "_" + type.name().toUpperCase();
+
+        String toolName = tool.toString();
+        if (toolName.endsWith(toolSuffix)) {
+            toolName = toolName.substring(0, toolName.length() - toolSuffix.length());
+        }
+
+        return switch (toolName) {
+            case "WOODEN" -> 1;
+            case "STONE" -> 2;
+            case "IRON" -> 3;
+            case "DIAMOND" -> 4;
+            case "NETHERITE" -> 8;
+
+            default -> 0.75f;
+        };
     }
 
     public static boolean onBlockPlace(BlockPlaceEvent e) {
