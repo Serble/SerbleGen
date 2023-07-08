@@ -92,12 +92,24 @@ public class OreResources {
                 continue;
             }
 
+            // Check if the player is using the correct tool
+            Player p = e.getPlayer();
+
+            // Check if the player's tool has the correct permission
+            if (!loc.permTag.equalsIgnoreCase("none")) {
+                ItemStack mainHand = p.getInventory().getItemInMainHand();
+                if (p.getGameMode() == GameMode.SURVIVAL && !NbtHandler.itemStackHasTag(mainHand, loc.permTag, PersistentDataType.STRING)) {
+                    p.sendMessage(ChatColor.RED + "This tool cannot break this block!");
+                    return 1;
+                }
+            }
+
             if (loc.breakCount > 1) {
                 // Check if the block has been broken enough times
                 Location blockLoc = e.getBlock().getLocation();
                 Float count = breakCounter.getOrDefault(blockLoc, null);
 
-                ItemStack hand = e.getPlayer().getInventory().getItemInMainHand();
+                ItemStack hand = p.getInventory().getItemInMainHand();
                 float breakPower = getBreakPower(hand.getType(), loc.toolType);
 
                 // Check if the player is using the correct tool
@@ -119,20 +131,8 @@ public class OreResources {
                 }
             }
 
-            // Check if the player is using the correct tool
-            Player p = e.getPlayer();
-
-            // Check if the player's tool has the correct permission
-            if (!loc.permTag.equalsIgnoreCase("none")) {
-                ItemStack mainHand = p.getInventory().getItemInMainHand();
-                if (p.getGameMode() == GameMode.SURVIVAL && !NbtHandler.itemStackHasTag(mainHand, loc.permTag, PersistentDataType.STRING)) {
-                    e.getPlayer().sendMessage(ChatColor.RED + "This tool cannot break this block!");
-                    return 1;
-                }
-            }
-
             // Respawn the block after delay, ignore if its a regrow pickaxe from genitems
-            PersistentDataContainer itemData = NbtHandler.getPersistentDataContainer(e.getPlayer().getInventory().getItemInMainHand());
+            PersistentDataContainer itemData = NbtHandler.getPersistentDataContainer(p.getInventory().getItemInMainHand());
             if (itemData == null || !Objects.equals(itemData.get(
                     Objects.requireNonNull(NamespacedKey.fromString("serbleitems:id")),
                     PersistentDataType.STRING), "regrow_pickaxe")) {
@@ -142,7 +142,7 @@ public class OreResources {
             }
 
             // Auto-pickup the item and give xp
-            if (e.getPlayer().getGameMode() == GameMode.SURVIVAL) {
+            if (p.getGameMode() == GameMode.SURVIVAL) {
                 e.setDropItems(false);
                 SerbleGen.giveItem(p, e.getBlock().getLocation(), new ItemStack(loc.dropItem, SerbleGen.random.nextInt(loc.dropVariation) + loc.dropMin));
 
