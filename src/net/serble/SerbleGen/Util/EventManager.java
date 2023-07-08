@@ -1,6 +1,7 @@
 package net.serble.SerbleGen.Util;
 
 import net.serble.SerbleGen.*;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -24,12 +25,6 @@ public class EventManager implements Listener {
     public void onBlockBreak(BlockBreakEvent e) {
         // Check if the block broken is in a gen world
         if (!SerbleGen.isInGenWorld(e.getBlock().getLocation())) {
-            return;
-        }
-
-        // Disallow breaking if it was not done by a player
-        if (!SerbleGen.isInGenWorld(e.getPlayer())) {
-            e.setCancelled(true);
             return;
         }
 
@@ -124,6 +119,12 @@ public class EventManager implements Listener {
 
         // Prevent crop trampling
         if (e.getAction() == Action.PHYSICAL && e.getClickedBlock().getType() == Material.FARMLAND) {
+            e.setCancelled(true);
+        }
+
+        // Disallow right clicking sweet berry bushes
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getClickedBlock().getType() == Material.SWEET_BERRY_BUSH) {
+            SerbleGen.debugService.debug(e.getPlayer(), "interact");
             e.setCancelled(true);
         }
 
