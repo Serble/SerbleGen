@@ -49,7 +49,7 @@ public class Shops {
 
     public static void onMove(PlayerMoveEvent e) {
         for (ShopLocation loc : locations) {
-            if (SerbleGen.isInArea(e.getTo(), loc)) {
+            if (SerbleGen.isInArea(e.getTo(), loc) && !SerbleGen.isInArea(e.getFrom(), loc)) {
                 SerbleGen.inventoryManagementService.setSpawnPoint(e.getPlayer(), loc.spawnPos);
             }
         }
