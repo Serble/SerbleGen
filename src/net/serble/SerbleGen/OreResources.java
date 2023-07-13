@@ -104,7 +104,7 @@ public class OreResources {
                 }
             }
 
-            if (loc.breakCount > 1) {
+            if (loc.breakCount > 1 && p.getGameMode() == GameMode.SURVIVAL) {
                 // Check if the block has been broken enough times
                 Location blockLoc = e.getBlock().getLocation();
                 Float count = breakCounter.getOrDefault(blockLoc, null);
