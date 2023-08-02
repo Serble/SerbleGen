@@ -5,7 +5,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.util.ArrayList;
@@ -58,6 +61,24 @@ public class Shops {
     public static void onDamage(EntityDamageEvent e) {
         for (ShopLocation loc : locations) {
             if (SerbleGen.isInArea(e.getEntity().getLocation(), loc)) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    public static void onHurt(EntityDamageByEntityEvent e) {
+        for (ShopLocation loc : locations) {
+            if (SerbleGen.isInArea(e.getEntity().getLocation(), loc) || SerbleGen.isInArea(e.getDamager().getLocation(), loc)) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    public static void onProjectileHit(ProjectileHitEvent e) {
+        Player shooter = (Player) e.getEntity().getShooter();
+
+        for (ShopLocation loc : locations) {
+            if (SerbleGen.isInArea(shooter.getLocation(), loc)) {
                 e.setCancelled(true);
             }
         }

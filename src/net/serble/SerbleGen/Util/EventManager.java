@@ -10,9 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -91,8 +89,27 @@ public class EventManager implements Listener {
     }
 
     @EventHandler
+    public void onHurt(EntityDamageByEntityEvent e) {
+        // Check if the player is in a gen world and is a player
+        if (!(e.getEntity() instanceof Player) || !(e.getDamager() instanceof Player) || !SerbleGen.isInGenWorld(e.getEntity())) {
+            return;
+        }
+
+        Shops.onHurt(e);
+    }
+
+    @EventHandler
+    public void onProjectileHit(ProjectileHitEvent e) {
+        if (!(e.getEntity().getShooter() instanceof Player) || !SerbleGen.isInGenWorld(e.getEntity())) {
+            return;
+        }
+
+        Shops.onProjectileHit(e);
+    }
+
+    @EventHandler
     public void onCraft(CraftItemEvent e) {
-        if (SerbleGen.isInGenWorld((Player) e.getWhoClicked())) {
+        if (SerbleGen.isInGenWorld(e.getWhoClicked())) {
             e.setCancelled(true);
         }
     }
