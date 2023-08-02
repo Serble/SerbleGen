@@ -104,7 +104,7 @@ public class OreResources {
                 }
             }
 
-            if (loc.breakCount > 1 && p.getGameMode() == GameMode.SURVIVAL) {
+            if (loc.breakCount > 1 && p.getGameMode() != GameMode.CREATIVE) {
                 // Check if the block has been broken enough times
                 Location blockLoc = e.getBlock().getLocation();
                 Float count = breakCounter.getOrDefault(blockLoc, null);
@@ -142,7 +142,7 @@ public class OreResources {
             }
 
             // Auto-pickup the item and give xp
-            if (p.getGameMode() == GameMode.SURVIVAL) {
+            if (p.getGameMode() != GameMode.CREATIVE) {
                 e.setDropItems(false);
                 SerbleGen.giveItem(p, e.getBlock().getLocation(), new ItemStack(loc.dropItem, SerbleGen.random.nextInt(loc.dropVariation) + loc.dropMin));
 

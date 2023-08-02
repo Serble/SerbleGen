@@ -42,7 +42,7 @@ public class EventManager implements Listener {
         }
 
         // Prevent breaking blocks in gen worlds
-        if (e.getPlayer().getGameMode() == GameMode.SURVIVAL) {
+        if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
             e.setCancelled(true);
         }
     }
@@ -58,7 +58,7 @@ public class EventManager implements Listener {
             return;
         }
 
-        if (e.getPlayer().getGameMode() == GameMode.SURVIVAL) {
+        if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
             e.setCancelled(true);
         }
     }
