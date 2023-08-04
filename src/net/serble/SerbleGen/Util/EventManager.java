@@ -12,8 +12,11 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
 public class EventManager implements Listener {
     // This class exists to prevent checks similar to isPlayerInGenWorld() from being repeated in multiple classes
@@ -151,6 +154,19 @@ public class EventManager implements Listener {
                     DROPPER, DISPENSER, BREWING_STAND -> true;
             default -> false;
         }) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onDropItem(PlayerDropItemEvent e) {
+        if (!SerbleGen.isInGenWorld(e.getPlayer())) {
+            return;
+        }
+
+        ItemStack item = e.getItemDrop().getItemStack();
+        if (e.getPlayer().getGameMode() != GameMode.CREATIVE &&
+                NbtHandler.itemStackHasTag(item, "no_drop", PersistentDataType.STRING)) {
             e.setCancelled(true);
         }
     }
