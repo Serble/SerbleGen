@@ -4,6 +4,7 @@ import net.serble.SerbleGen.Schemas.ResourceLocation;
 import net.serble.SerbleGen.Schemas.ShopLocation;
 import net.serble.SerbleGen.Util.EventManager;
 import net.serble.serblenetworkplugin.API.DebugService;
+import net.serble.serblenetworkplugin.API.IdService;
 import net.serble.serblenetworkplugin.API.InventoryManagementService;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
@@ -22,6 +23,7 @@ public class SerbleGen extends JavaPlugin {
     public static Random random = new Random();
     public static DebugService debugService;
     public static InventoryManagementService inventoryManagementService;
+    public static IdService idService;
 
     @Override
     public void onEnable() {
@@ -32,6 +34,7 @@ public class SerbleGen extends JavaPlugin {
         Bags.init();
         Shops.init();
         RareDrops.init();
+        StartingItems.init();
 
         genWorlds = getConfig().getStringList("gen-worlds");
         fullFeaturedWorlds = getConfig().getStringList("full-featured-worlds");
@@ -53,6 +56,13 @@ public class SerbleGen extends JavaPlugin {
             inventoryManagementService = invServiceProvider.getProvider();
         } else {
             Bukkit.getLogger().warning("InvService not found!");
+        }
+
+        RegisteredServiceProvider<IdService> idServiceProvider = getServer().getServicesManager().getRegistration(IdService.class);
+        if (idServiceProvider != null) {
+            idService = idServiceProvider.getProvider();
+        } else {
+            Bukkit.getLogger().warning("IdService not found!");
         }
     }
 

@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -181,5 +182,15 @@ public class EventManager implements Listener {
         if (e.getBlock().getType() == Material.FARMLAND && e.getTo() == Material.DIRT) {
             e.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onPlayerChangeWorld(PlayerChangedWorldEvent e) {
+        if (!SerbleGen.isInFullFeaturedWorld(e.getPlayer())) {
+            return;
+        }
+
+        e.getPlayer().setGameMode(GameMode.ADVENTURE);
+        StartingItems.onPlayerJoin(e);
     }
 }
