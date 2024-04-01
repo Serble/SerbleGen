@@ -1,7 +1,6 @@
 package net.serble.SerbleGen.Util;
 
 import net.serble.SerbleGen.*;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -153,7 +152,7 @@ public class EventManager implements Listener {
         if (switch (e.getClickedBlock().getType()) {
             case CHEST, TRAPPED_CHEST, BARREL, FURNACE, BLAST_FURNACE, SMOKER, HOPPER,
                     DROPPER, DISPENSER, BREWING_STAND -> true;
-            default -> false;
+            default -> e.getClickedBlock().getType().name().endsWith("TRAPDOOR");
         }) {
             e.setCancelled(true);
         }
