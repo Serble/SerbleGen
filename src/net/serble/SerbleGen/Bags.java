@@ -49,6 +49,11 @@ public class Bags implements Listener {
 
         e.setCancelled(true);
 
+        if (item.getAmount() > 1) {
+            p.sendMessage(ChatColor.DARK_RED + "Please split the stack to use the bag!");
+            return;
+        }
+
         // Get the bag's data
         int size = NbtHandler.getTag(data, "bag_size", PersistentDataType.INTEGER);
         String name = NbtHandler.getTag(data, "bag_name", PersistentDataType.STRING);
