@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -143,7 +144,10 @@ public class EventManager implements Listener {
         }
 
         // Disallow right clicking sweet berry bushes
-        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getClickedBlock().getType() == Material.SWEET_BERRY_BUSH) {
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK && switch (e.getClickedBlock().getType()) {
+            case SWEET_BERRY_BUSH, FLOWER_POT, CAMPFIRE -> true;
+            default -> e.getClickedBlock().getType().name().endsWith("POTTED");
+        }) {
             SerbleGen.debugService.debug(e.getPlayer(), "interact");
             e.setCancelled(true);
         }
@@ -191,5 +195,17 @@ public class EventManager implements Listener {
 
         e.getPlayer().setGameMode(GameMode.ADVENTURE);
         StartingItems.onPlayerJoin(e);
+    }
+
+    @EventHandler
+    public void onVehicleDestroy(VehicleDestroyEvent e) {
+        if (!SerbleGen.isInGenWorld(e.getVehicle().getLocation()) || !(e.getAttacker() instanceof Player)) {
+            return;
+        }
+
+        Player p = (Player) e.getAttacker();
+        if (!p.getGameMode().equals(GameMode.CREATIVE)) {
+            e.setCancelled(true);
+        }
     }
 }
