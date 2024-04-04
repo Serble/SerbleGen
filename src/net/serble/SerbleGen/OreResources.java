@@ -1,6 +1,6 @@
 package net.serble.SerbleGen;
 
-import net.serble.SerbleGen.Schemas.ResourceLocation;
+import net.serble.SerbleGen.Schemas.OreLocation;
 import net.serble.SerbleGen.Schemas.ToolType;
 import net.serble.SerbleGen.Util.NbtHandler;
 import org.bukkit.*;
@@ -16,32 +16,22 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.*;
 
 public class OreResources {
-    public static List<ResourceLocation> locations;
+    public static List<OreLocation> locations;
     public static Map<Location, Float> breakCounter = new HashMap<>();
 
     public static void init() {
         double defaultRespawnTime = SerbleGen.plugin.getConfig().getDouble("respawn-time");
 
-        ConfigurationSection configLocations = SerbleGen.plugin.getConfig().getConfigurationSection("resources");
+        ConfigurationSection configLocations = SerbleGen.plugin.getConfig().getConfigurationSection("ore_gens");
 
         locations = new ArrayList<>();
         for (String resKey : configLocations.getKeys(false)) {
             ConfigurationSection res = configLocations.getConfigurationSection(resKey);
 
-            ResourceLocation loc = new ResourceLocation();
+            OreLocation loc = new OreLocation();
             World world = Bukkit.getWorld(res.getString("world"));
-            {
-                List<Location> pos1s = new ArrayList<>();
-                List<Location> pos2s = new ArrayList<>();
-                for (String pointKey : res.getStringList("points")) {
-                    String[] locSplit = pointKey.split(" ");
-                    pos1s.add(new Location(world, Integer.parseInt(locSplit[0]), Integer.parseInt(locSplit[1]), Integer.parseInt(locSplit[2])));
-                    pos2s.add(new Location(world, Integer.parseInt(locSplit[3]), Integer.parseInt(locSplit[4]), Integer.parseInt(locSplit[5])));
-                }
+            SerbleGen.getLocations(world, res, loc);
 
-                loc.pos1s = pos1s.toArray(new Location[0]);
-                loc.pos2s = pos2s.toArray(new Location[0]);
-            }
             loc.blockType = Material.getMaterial(res.getString("block"));
             loc.dropItem = loc.blockType;
 
@@ -87,7 +77,7 @@ public class OreResources {
 
     public static int onBlockBreak(BlockBreakEvent e) {
         // Check if the block is a specific tool area
-        for (ResourceLocation loc : locations) {
+        for (OreLocation loc : locations) {
             if (!SerbleGen.isInArea(e.getBlock().getLocation(), loc)) {
                 continue;
             }
@@ -175,7 +165,7 @@ public class OreResources {
 
     public static boolean onBlockPlace(BlockPlaceEvent e) {
         // Only allow if the block is in a specific resource and the type matches the resource type
-        for (ResourceLocation loc : locations) {
+        for (OreLocation loc : locations) {
             if (SerbleGen.isInArea(e.getBlock().getLocation(), loc) && e.getBlockPlaced().getType() == loc.blockType) {
                 return true;
             }
@@ -185,22 +175,15 @@ public class OreResources {
     }
 
     public static void respawnAll() {
-        for (ResourceLocation loc : locations) {
+        for (OreLocation loc : locations) {
             for (int i = 0; i < loc.pos1s.length; i++) {
                 Location pos1 = loc.pos1s[i];
                 Location pos2 = loc.pos2s[i];
 
-                int minX = Math.min(pos1.getBlockX(), pos2.getBlockX());
-                int maxX = Math.max(pos1.getBlockX(), pos2.getBlockX());
-                int minY = Math.min(pos1.getBlockY(), pos2.getBlockY());
-                int maxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
-                int minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
-                int maxZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
-
                 // Loop through and fill blocks
-                for (int x = minX; x <= maxX; x++) {
-                    for (int y = minY; y <= maxY; y++) {
-                        for (int z = minZ; z <= maxZ; z++) {
+                for (int x = pos1.getBlockX(); x <= pos2.getBlockX(); x++) {
+                    for (int y = pos1.getBlockY(); y <= pos2.getBlockY(); y++) {
+                        for (int z = pos1.getBlockZ(); z <= pos2.getBlockZ(); z++) {
                             Objects.requireNonNull(pos1.getWorld()).getBlockAt(x, y, z).setType(loc.blockType);
                         }
                     }

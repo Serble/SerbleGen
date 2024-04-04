@@ -95,11 +95,25 @@ public class EventManager implements Listener {
     @EventHandler
     public void onHurt(EntityDamageByEntityEvent e) {
         // Check if the player is in a gen world and is a player
-        if (!(e.getEntity() instanceof Player) || !(e.getDamager() instanceof Player) || !SerbleGen.isInGenWorld(e.getEntity())) {
+        if (!(e.getDamager() instanceof Player) || !SerbleGen.isInGenWorld(e.getEntity())) {
+            return;
+        }
+
+        if (!(e.getEntity() instanceof Player)) {
+            MonsterResources.onMonsterDamageByPlayer(e);
             return;
         }
 
         Shops.onHurt(e);
+    }
+
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent e) {
+        if (!SerbleGen.isInFullFeaturedWorld(e.getEntity())) {
+            return;
+        }
+
+        MonsterResources.onMonsterDeath(e);
     }
 
     @EventHandler

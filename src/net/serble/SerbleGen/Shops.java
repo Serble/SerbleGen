@@ -1,5 +1,7 @@
 package net.serble.SerbleGen;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.serble.SerbleGen.Schemas.ShopLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -27,18 +29,7 @@ public class Shops {
             ShopLocation loc = new ShopLocation();
             World world = Bukkit.getWorld(res.getString("world"));
 
-            {
-                List<Location> pos1s = new ArrayList<>();
-                List<Location> pos2s = new ArrayList<>();
-                for (String pointKey : res.getStringList("points")) {
-                    String[] locSplit = pointKey.split(" ");
-                    pos1s.add(new Location(world, Integer.parseInt(locSplit[0]), Integer.parseInt(locSplit[1]), Integer.parseInt(locSplit[2])));
-                    pos2s.add(new Location(world, Integer.parseInt(locSplit[3]), Integer.parseInt(locSplit[4]), Integer.parseInt(locSplit[5])));
-                }
-
-                loc.pos1s = pos1s.toArray(new Location[0]);
-                loc.pos2s = pos2s.toArray(new Location[0]);
-            }
+            SerbleGen.getLocations(world, res, loc);
 
             {
                 String[] spawnSplit = res.getString("spawn").split(" ");
@@ -54,6 +45,7 @@ public class Shops {
         for (ShopLocation loc : locations) {
             if (SerbleGen.isInArea(e.getTo(), loc) && !SerbleGen.isInArea(e.getFrom(), loc)) {
                 SerbleGen.inventoryManagementService.setSpawnPoint(e.getPlayer(), loc.spawnPos);
+                e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Spawn point set!"));
             }
         }
     }
@@ -78,7 +70,7 @@ public class Shops {
         Player shooter = (Player) e.getEntity().getShooter();
 
         for (ShopLocation loc : locations) {
-            if (SerbleGen.isInArea(shooter.getLocation(), loc)) {
+            if (SerbleGen.isInArea(shooter.getLocation(), loc) || SerbleGen.isInArea(e.getHitEntity().getLocation(), loc)) {
                 e.setCancelled(true);
             }
         }

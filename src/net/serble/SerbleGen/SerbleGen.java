@@ -1,19 +1,24 @@
 package net.serble.SerbleGen;
 
-import net.serble.SerbleGen.Schemas.ResourceLocation;
-import net.serble.SerbleGen.Schemas.ShopLocation;
+import net.serble.SerbleGen.Schemas.AreaLocation;
 import net.serble.SerbleGen.Util.EventManager;
 import net.serble.serblenetworkplugin.API.DebugService;
 import net.serble.serblenetworkplugin.API.IdService;
 import net.serble.serblenetworkplugin.API.InventoryManagementService;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 
 public class SerbleGen extends JavaPlugin {
 
@@ -31,6 +36,7 @@ public class SerbleGen extends JavaPlugin {
         this.saveDefaultConfig();
 
         OreResources.init();
+        MonsterResources.init();
         Bags.init();
         Shops.init();
         RareDrops.init();
@@ -69,6 +75,7 @@ public class SerbleGen extends JavaPlugin {
     @Override
     public void onDisable() {
         Bags.onDisable();
+        MonsterResources.despawnAll();
     }
 
     public static void addXp(Player p, float amount) {
@@ -97,35 +104,17 @@ public class SerbleGen extends JavaPlugin {
         return fullFeaturedWorlds.contains(loc.getWorld().getName());
     }
 
-    public static boolean isInArea(Location loc, ResourceLocation res) {
-        if (res.pos1s.length == 0) {
+    public static boolean isInArea(Location loc, AreaLocation location) {
+        if (location.pos1s.length == 0) {
             return false;
         }
 
-        if (res.pos1s[0].getWorld().getUID() != loc.getWorld().getUID()) {
+        if (location.pos1s[0].getWorld().getUID() != loc.getWorld().getUID()) {
             return false;
         }
 
-        for (int i = 0; i < res.pos1s.length; i++) {
-            if (isInArea(loc, res.pos1s[i], res.pos2s[i])) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public static boolean isInArea(Location loc, ShopLocation shop) {
-        if (shop.pos1s.length == 0) {
-            return false;
-        }
-
-        if (shop.pos1s[0].getWorld().getUID() != loc.getWorld().getUID()) {
-            return false;
-        }
-
-        for (int i = 0; i < shop.pos1s.length; i++) {
-            if (isInArea(loc, shop.pos1s[i], shop.pos2s[i])) {
+        for (int i = 0; i < location.pos1s.length; i++) {
+            if (isInArea(loc, location.pos1s[i], location.pos2s[i])) {
                 return true;
             }
         }
@@ -134,16 +123,44 @@ public class SerbleGen extends JavaPlugin {
     }
 
     public static boolean isInArea(Location loc, Location pos1, Location pos2) {
-        return loc.getX() >= Math.min(pos1.getX(), pos2.getX()) && loc.getX() <= Math.max(pos1.getX(), pos2.getX()) &&
-                loc.getY() >= Math.min(pos1.getY(), pos2.getY()) && loc.getY() <= Math.max(pos1.getY(), pos2.getY()) &&
-                loc.getZ() >= Math.min(pos1.getZ(), pos2.getZ()) && loc.getZ() <= Math.max(pos1.getZ(), pos2.getZ());
+        return loc.getX() >= pos1.getX() && loc.getX() <= pos2.getX() &&
+                loc.getY() >= pos1.getY() && loc.getY() <= pos2.getY() &&
+                loc.getZ() >= pos1.getZ() && loc.getZ() <= pos2.getZ();
     }
 
-    public static void giveItem(Player p, Location blockLocation, ItemStack... items) {
+    public static void giveItem(Player p, Location dropLocation, ItemStack... items) {
         HashMap<Integer, ItemStack> failedItems = p.getInventory().addItem(items);
 
         for (ItemStack item : failedItems.values()) {
-            p.getWorld().dropItemNaturally(blockLocation, item);
+            p.getWorld().dropItemNaturally(dropLocation, item);
         }
+    }
+
+    public static void getLocations(World world, ConfigurationSection res, AreaLocation loc) {
+        List<Location> pos1s = new ArrayList<>();
+        List<Location> pos2s = new ArrayList<>();
+        for (String pointKey : res.getStringList("points")) {
+            String[] locSplit = pointKey.split(" ");
+
+            int x1 = Integer.parseInt(locSplit[0]);
+            int y1 = Integer.parseInt(locSplit[1]);
+            int z1 = Integer.parseInt(locSplit[2]);
+            int x2 = Integer.parseInt(locSplit[3]);
+            int y2 = Integer.parseInt(locSplit[4]);
+            int z2 = Integer.parseInt(locSplit[5]);
+
+            int xMin = Math.min(x1, x2);
+            int yMin = Math.min(y1, y2);
+            int zMin = Math.min(z1, z2);
+            int xMax = Math.max(x1, x2);
+            int yMax = Math.max(y1, y2);
+            int zMax = Math.max(z1, z2);
+
+            pos1s.add(new Location(world, xMin, yMin, zMin));
+            pos2s.add(new Location(world, xMax, yMax, zMax));
+        }
+
+        loc.pos1s = pos1s.toArray(new Location[0]);
+        loc.pos2s = pos2s.toArray(new Location[0]);
     }
 }

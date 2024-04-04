@@ -59,7 +59,7 @@ drops:
 #    command: serbleitem throwable_fireball %s 4-8
 
 # Generators
-resources:
+ore_gens:
 #    example_gen:
 #      world: world
 #      points:
